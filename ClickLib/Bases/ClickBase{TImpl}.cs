@@ -72,17 +72,6 @@ public abstract unsafe class ClickBase<TImpl> : IClickable
         return this;
     }
 
-    /// <summary>
-    /// Hide the addon.
-    /// </summary>
-    /// <returns>Itself.</returns>
-    protected TImpl HideAddon()
-    {
-        this.UnitBase->Hide(false);
-
-        return this;
-    }
-
     private IntPtr GetAddonByName(string name, int index = 1)
     {
         var atkStage = AtkStage.GetSingleton();
