@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using ClickLib.Exceptions;
 using ClickLib.Structures;
@@ -78,7 +78,7 @@ public abstract unsafe class ClickBase<TImpl> : IClickable
     /// <returns>Itself.</returns>
     protected TImpl HideAddon()
     {
-        this.UnitBase->Hide(false);
+        this.UnitBase->Hide(false, true, 1);
 
         return this;
     }
