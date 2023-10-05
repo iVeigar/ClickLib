@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 using ClickLib.Enums;
@@ -17,7 +17,7 @@ namespace ClickLib.Bases;
 /// <param name="eventData">Event data.</param>
 /// <param name="inputData">Keyboard and mouse data.</param>
 /// <returns>The addon address.</returns>
-internal unsafe delegate IntPtr ReceiveEventDelegate(AtkEventListener* eventListener, EventType evt, uint which, void* eventData, void* inputData);
+public unsafe delegate IntPtr ReceiveEventDelegate(AtkEventListener* eventListener, EventType evt, uint which, void* eventData, void* inputData);
 
 /// <summary>
 /// Click base class.
@@ -148,21 +148,21 @@ public abstract unsafe partial class ClickBase<TImpl, TStruct> : ClickBase<TImpl
     /// <param name="which">Internal routing number.</param>
     /// <param name="eventData">Event data.</param>
     /// <param name="inputData">Keyboard and mouse data.</param>
-    private void InvokeReceiveEvent(AtkEventListener* eventListener, EventType type, uint which, EventData eventData, InputData inputData)
+    public void InvokeReceiveEvent(AtkEventListener* eventListener, EventType type, uint which, EventData eventData, InputData inputData)
     {
         var receiveEvent = this.GetReceiveEvent(eventListener);
         receiveEvent(eventListener, type, which, eventData.Data, inputData.Data);
     }
 
-    private ReceiveEventDelegate GetReceiveEvent(AtkEventListener* listener)
+    public ReceiveEventDelegate GetReceiveEvent(AtkEventListener* listener)
     {
         var receiveEventAddress = new IntPtr(listener->vfunc[2]);
         return Marshal.GetDelegateForFunctionPointer<ReceiveEventDelegate>(receiveEventAddress)!;
     }
 
-    private ReceiveEventDelegate GetReceiveEvent(AtkComponentBase* listener)
+    public ReceiveEventDelegate GetReceiveEvent(AtkComponentBase* listener)
         => this.GetReceiveEvent(&listener->AtkEventListener);
 
-    private ReceiveEventDelegate GetReceiveEvent(AtkUnitBase* listener)
+    public ReceiveEventDelegate GetReceiveEvent(AtkUnitBase* listener)
         => this.GetReceiveEvent(&listener->AtkEventListener);
 }
