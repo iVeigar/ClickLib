@@ -2,6 +2,8 @@ using System;
 
 using ClickLib.Exceptions;
 using ClickLib.Structures;
+using ECommons;
+using ECommons.Automation;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace ClickLib.Bases;
@@ -53,9 +55,18 @@ public abstract unsafe class ClickBase<TImpl> : IClickable
     /// <returns>Itself.</returns>
     protected TImpl FireCallback(params object[] values)
     {
-        var atkValues = new AtkValueArray(values);
-        this.UnitBase->FireCallback(atkValues.Length, atkValues);
-        atkValues.Dispose();
+        // var atkValues = new AtkValueArray(values);
+        // this.UnitBase->FireCallback(atkValues.Length, atkValues);
+        // atkValues.Dispose();
+
+        try
+        {
+            Callback.Fire(this.UnitBase, true, values);
+        }
+        catch (Exception e)
+        {
+            e.Log();
+        }
 
         return this;
     }
@@ -78,7 +89,7 @@ public abstract unsafe class ClickBase<TImpl> : IClickable
     /// <returns>Itself.</returns>
     protected TImpl HideAddon()
     {
-        this.UnitBase->Hide(false, true, 1);
+        this.UnitBase->Hide(false, true, 0);
 
         return this;
     }
