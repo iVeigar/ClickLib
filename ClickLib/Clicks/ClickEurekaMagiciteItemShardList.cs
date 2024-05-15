@@ -30,14 +30,22 @@ public sealed unsafe class ClickEurekaMagiciteItemShardList : ClickBase<ClickEur
     /// <summary>
     /// Switch to a different magicite category.
     /// </summary>
-    /// <param name="cateId">magicite category index (0-6) in the UI.</param>
-    public void SwitchCategory(int cateId)
-        => this.FireCallback(12, cateId);
+    /// <param name="cate">magicite category index (0-6).</param>
+    public void SwitchCategory(uint cate)
+        => this.FireCallback(12, cate);
 
     /// <summary>
-    /// Put a magicite item into the selected array.
+    /// Put the magicite shard into the highlighted array.
     /// </summary>
-    /// <param name="index">magicite item index (1-28).</param>
-    public void SelectItem(int index)
-        => this.FireCallback(14, index);
+    /// <param name="item">magicite item index (1-28).</param>
+    public void ClickItem(int item)
+        => this.FireCallback(14, item);
+
+    /// <summary>
+    /// Put the magicite shard in specified array.
+    /// </summary>
+    /// <param name="array">Array id, umbral array (1) or astral array (0).</param>
+    /// <param name="item">magicite item index (1-28).</param>
+    public void Put(int array, int item)
+        => this.FireCallback(22, (uint)(array << 16) + item);
 }
