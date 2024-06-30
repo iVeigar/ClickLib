@@ -69,8 +69,8 @@ public abstract unsafe partial class ClickBase<TImpl, TStruct> : ClickBase<TImpl
     /// <param name="target">Target node.</param>
     /// <param name="which">Internal game click routing.</param>
     /// <param name="type">Event type.</param>
-    protected void ClickAddonRadioButton(AtkComponentRadioButton* target, uint which, EventType type = EventType.CHANGE)
-        => this.ClickAddonComponent(target->AtkComponentBase.OwnerNode, which, type);
+    // protected void ClickAddonRadioButton(AtkComponentRadioButton* target, uint which, EventType type = EventType.CHANGE)
+    //    => this.ClickAddonComponent(target->AtkComponentBase.OwnerNode, which, type);
 
     /// <summary>
     /// Send a click.
@@ -97,7 +97,7 @@ public abstract unsafe partial class ClickBase<TImpl, TStruct> : ClickBase<TImpl
     /// <param name="type">Event type.</param>
     protected void ClickAddonStage(uint which, EventType type = EventType.MOUSE_CLICK)
     {
-        var target = AtkStage.GetSingleton();
+        var target = AtkStage.Instance();
 
         var eventData = EventData.ForNormalTarget(target, this.UnitBase);
         var inputData = InputData.Empty();
@@ -158,28 +158,29 @@ public abstract unsafe partial class ClickBase<TImpl, TStruct> : ClickBase<TImpl
     {
         try
         {
-            var receiveEvent = this.GetReceiveEvent(eventListener);
-            receiveEvent(eventListener, type, which, eventData.Data, inputData.Data);
+            // var receiveEvent = this.GetReceiveEvent(eventListener);
+            // receiveEvent(eventListener, type, which, eventData.Data, inputData.Data);
+            eventListener->ReceiveEvent((AtkEventType)type, (int)which, (AtkEvent*)eventData.Data, (AtkEventData*)inputData.Data);
         }
         catch { }
     }
 
-    public ReceiveEventDelegate GetReceiveEvent(AtkEventListener* listener)
-    {
-        try
-        {
-            var receiveEventAddress = new IntPtr(listener->vfunc[2]);
-            return Marshal.GetDelegateForFunctionPointer<ReceiveEventDelegate>(receiveEventAddress)!;
-        }
-        catch 
-        {
-            return null;
-        }
-    }
+    // public ReceiveEventDelegate GetReceiveEvent(AtkEventListener* listener)
+    // {
+    //    try
+    //    {
+    //        var receiveEventAddress = new IntPtr(listener->vfunc[2]);
+    //        return Marshal.GetDelegateForFunctionPointer<ReceiveEventDelegate>(receiveEventAddress)!;
+    //    }
+    //    catch 
+    //    {
+    //        return null;
+    //    }
+    // }
 
-    public ReceiveEventDelegate GetReceiveEvent(AtkComponentBase* listener)
-        => this.GetReceiveEvent(&listener->AtkEventListener);
+    // public ReceiveEventDelegate GetReceiveEvent(AtkComponentBase* listener)
+    //    => this.GetReceiveEvent(&listener->AtkEventListener);
 
-    public ReceiveEventDelegate GetReceiveEvent(AtkUnitBase* listener)
-        => this.GetReceiveEvent(&listener->AtkEventListener);
+    // public ReceiveEventDelegate GetReceiveEvent(AtkUnitBase* listener)
+    //    => this.GetReceiveEvent(&listener->AtkEventListener);
 }

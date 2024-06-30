@@ -76,12 +76,12 @@ public abstract unsafe class ClickBase<TImpl> : IClickable
     /// </summary>
     /// <param name="a4">A parameter.</param>
     /// <returns>Itself.</returns>
-    protected TImpl FireNullCallback(ulong a4)
-    {
-        this.UnitBase->FireCallback(0, null, (void*)a4);
+    // protected TImpl FireNullCallback(ulong a4)
+    // {
+    //    this.UnitBase->FireCallback(0, null, (void*)a4);
 
-        return this;
-    }
+    // return this;
+    // }
 
     /// <summary>
     /// Hide the addon.
@@ -96,7 +96,7 @@ public abstract unsafe class ClickBase<TImpl> : IClickable
 
     private IntPtr GetAddonByName(string name, int index = 1)
     {
-        var atkStage = AtkStage.GetSingleton();
+        var atkStage = AtkStage.Instance();
         if (atkStage == null)
             throw new InvalidClickException("AtkStage is not available");
 
