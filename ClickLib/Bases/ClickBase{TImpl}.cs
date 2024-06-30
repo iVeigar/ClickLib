@@ -1,9 +1,7 @@
-using System;
+﻿using System;
 
 using ClickLib.Exceptions;
 using ClickLib.Structures;
-using ECommons;
-using ECommons.Automation;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace ClickLib.Bases;
@@ -55,18 +53,9 @@ public abstract unsafe class ClickBase<TImpl> : IClickable
     /// <returns>Itself.</returns>
     protected TImpl FireCallback(params object[] values)
     {
-        // var atkValues = new AtkValueArray(values);
-        // this.UnitBase->FireCallback(atkValues.Length, atkValues);
-        // atkValues.Dispose();
-
-        try
-        {
-            Callback.Fire(this.UnitBase, true, values);
-        }
-        catch (Exception e)
-        {
-            e.Log();
-        }
+        var atkValues = new AtkValueArray(values);
+        this.UnitBase->FireCallback((uint)atkValues.Length, atkValues);
+        atkValues.Dispose();
 
         return this;
     }
@@ -76,12 +65,12 @@ public abstract unsafe class ClickBase<TImpl> : IClickable
     /// </summary>
     /// <param name="a4">A parameter.</param>
     /// <returns>Itself.</returns>
-    // protected TImpl FireNullCallback(ulong a4)
-    // {
-    //    this.UnitBase->FireCallback(0, null, (void*)a4);
+    protected TImpl FireNullCallback(ulong a4)
+    {
+        this.UnitBase->FireCallback(0, null, a4 != 0);
 
-    // return this;
-    // }
+        return this;
+    }
 
     /// <summary>
     /// Hide the addon.
@@ -89,7 +78,7 @@ public abstract unsafe class ClickBase<TImpl> : IClickable
     /// <returns>Itself.</returns>
     protected TImpl HideAddon()
     {
-        this.UnitBase->Hide(false, true, 0);
+        this.UnitBase->Hide(false, false, 0);
 
         return this;
     }

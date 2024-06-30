@@ -1,9 +1,10 @@
+﻿using System;
+using System.Runtime.InteropServices;
+
 using ClickLib.Enums;
 using ClickLib.Structures;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using System;
-using System.Runtime.InteropServices;
 
 namespace ClickLib.Bases;
 
@@ -16,7 +17,7 @@ namespace ClickLib.Bases;
 /// <param name="eventData">Event data.</param>
 /// <param name="inputData">Keyboard and mouse data.</param>
 /// <returns>The addon address.</returns>
-public unsafe delegate IntPtr ReceiveEventDelegate(AtkEventListener* eventListener, EventType evt, uint which, void* eventData, void* inputData);
+internal unsafe delegate IntPtr ReceiveEventDelegate(AtkEventListener* eventListener, EventType evt, uint which, void* eventData, void* inputData);
 
 /// <summary>
 /// Click base class.
@@ -69,8 +70,8 @@ public abstract unsafe partial class ClickBase<TImpl, TStruct> : ClickBase<TImpl
     /// <param name="target">Target node.</param>
     /// <param name="which">Internal game click routing.</param>
     /// <param name="type">Event type.</param>
-    // protected void ClickAddonRadioButton(AtkComponentRadioButton* target, uint which, EventType type = EventType.CHANGE)
-    //    => this.ClickAddonComponent(target->AtkComponentBase.OwnerNode, which, type);
+    protected void ClickAddonRadioButton(AtkComponentRadioButton* target, uint which, EventType type = EventType.CHANGE)
+        => this.ClickAddonComponent(target->OwnerNode, which, type);
 
     /// <summary>
     /// Send a click.
@@ -115,17 +116,10 @@ public abstract unsafe partial class ClickBase<TImpl, TStruct> : ClickBase<TImpl
     /// <param name="inputData">Input data.</param>
     protected void ClickAddonComponent(AtkComponentNode* target, uint which, EventType type, EventData? eventData = null, InputData? inputData = null)
     {
-        try
-        {
-            eventData ??= EventData.ForNormalTarget(target, this.UnitBase);
-            inputData ??= InputData.Empty();
+        eventData ??= EventData.ForNormalTarget(target, this.UnitBase);
+        inputData ??= InputData.Empty();
 
-            this.InvokeReceiveEvent(&this.UnitBase->AtkEventListener, type, which, eventData, inputData);
-        }
-        catch (Exception ex)
-        {
-            
-        }
+        this.InvokeReceiveEvent(&this.UnitBase->AtkEventListener, type, which, eventData, inputData);
     }
 
     /// <summary>
@@ -154,33 +148,21 @@ public abstract unsafe partial class ClickBase<TImpl, TStruct> : ClickBase<TImpl
     /// <param name="which">Internal routing number.</param>
     /// <param name="eventData">Event data.</param>
     /// <param name="inputData">Keyboard and mouse data.</param>
-    public void InvokeReceiveEvent(AtkEventListener* eventListener, EventType type, uint which, EventData eventData, InputData inputData)
+    private void InvokeReceiveEvent(AtkEventListener* eventListener, EventType type, uint which, EventData eventData, InputData inputData)
     {
-        try
-        {
-            // var receiveEvent = this.GetReceiveEvent(eventListener);
-            // receiveEvent(eventListener, type, which, eventData.Data, inputData.Data);
-            eventListener->ReceiveEvent((AtkEventType)type, (int)which, (AtkEvent*)eventData.Data, (AtkEventData*)inputData.Data);
-        }
-        catch { }
+        var receiveEvent = this.GetReceiveEvent(eventListener);
+        receiveEvent(eventListener, type, which, eventData.Data, inputData.Data);
     }
 
-    // public ReceiveEventDelegate GetReceiveEvent(AtkEventListener* listener)
-    // {
-    //    try
-    //    {
-    //        var receiveEventAddress = new IntPtr(listener->vfunc[2]);
-    //        return Marshal.GetDelegateForFunctionPointer<ReceiveEventDelegate>(receiveEventAddress)!;
-    //    }
-    //    catch 
-    //    {
-    //        return null;
-    //    }
-    // }
+    private ReceiveEventDelegate GetReceiveEvent(AtkEventListener* listener)
+    {
+        var receiveEventAddress = new IntPtr(listener->VirtualTable->ReceiveGlobalEvent);
+        return Marshal.GetDelegateForFunctionPointer<ReceiveEventDelegate>(receiveEventAddress)!;
+    }
 
-    // public ReceiveEventDelegate GetReceiveEvent(AtkComponentBase* listener)
-    //    => this.GetReceiveEvent(&listener->AtkEventListener);
+    private ReceiveEventDelegate GetReceiveEvent(AtkComponentBase* listener)
+        => this.GetReceiveEvent(&listener->AtkEventListener);
 
-    // public ReceiveEventDelegate GetReceiveEvent(AtkUnitBase* listener)
-    //    => this.GetReceiveEvent(&listener->AtkEventListener);
+    private ReceiveEventDelegate GetReceiveEvent(AtkUnitBase* listener)
+        => this.GetReceiveEvent(&listener->AtkEventListener);
 }
