@@ -56,7 +56,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <ProjectReference Include="..\..\ECommons\ECommons\ECommons.csproj" />
     <Reference Include="Dalamud" Private="False" />
     <Reference Include="FFXIVClientStructs" Private="False" />
   </ItemGroup>
